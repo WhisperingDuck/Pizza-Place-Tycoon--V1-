@@ -56,9 +56,9 @@ This plan breaks down the project into small, self-contained tasks. Each step is
 - [x] Ensure all controls are keyboard accessible
 
 ## 10. Manual Testing & Iteration
-- [ ] Playtest each feature as it's added
-- [ ] Refactor and fix bugs as needed
-- [ ] Prepare for next feature chunk based on feedback
+- [x] Playtest each feature as it's added
+- [x] Refactor and fix bugs as needed
+- [x] Prepare for next feature chunk based on feedback
 
 ## UI/UX & Refactor TODOs
 
