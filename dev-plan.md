@@ -21,9 +21,9 @@ This plan breaks down the project into small, self-contained tasks. Each step is
 - [x] Add basic responsive styling for desktop and mobile
 
 ## 3. Core Game State & Loop
-- [ ] Define game state object (resources, day, phase, etc.)
-- [ ] Implement phase transitions: Management → Day → End-of-Day
-- [ ] Add state update logic for each phase
+- [x] Define game state object (resources, day, phase, etc.)
+- [x] Implement phase transitions: Management → Day → End-of-Day
+- [x] Add state update logic for each phase
 
 ## 4. Core Resource Systems
 - [ ] Implement Cash and Health state and update logic

@@ -99,4 +99,140 @@ const gameState = {
 
   // Staff (future, for now always 0)
   staff: 0,
-}; 
+};
+
+// --- Phase Transition & State Update Logic ---
+
+// Helper: Add a message to the business log
+function logEvent(message) {
+  gameState.log.push(`[Day ${gameState.day}] ${message}`);
+}
+
+// Transition to Management Phase
+function toManagementPhase() {
+  gameState.phase = 'management';
+  logEvent('Entered Management Phase. Plan your next day!');
+  // (Future: enable management actions, update UI, etc.)
+}
+
+// Transition to Day Phase
+function toDayPhase() {
+  gameState.phase = 'day';
+  logEvent('Day Cycle started! Customers are arriving...');
+  // (Future: start 20s timer, process customer events, etc.)
+}
+
+// Transition to End-of-Day Phase
+function toEndOfDayPhase() {
+  gameState.phase = 'endOfDay';
+  logEvent('End of Day. Calculating results...');
+  // (Future: process summary, expenses, spoilage, health drop, etc.)
+}
+
+// Example: Start in Management Phase
+// (In future, this will be triggered by UI or game start logic)
+toManagementPhase();
+
+// --- Management Phase Actions (MVP) ---
+
+// Buy Flour (MVP: fixed price, e.g., $5 per unit)
+function buyFlour(units = 1) {
+  const flourPrice = 5;
+  const totalCost = flourPrice * units;
+  if (gameState.cash < totalCost) {
+    logEvent(`Not enough cash to buy ${units} flour.`);
+    return false;
+  }
+  gameState.cash -= totalCost;
+  gameState.inventory.flour += units;
+  logEvent(`Bought ${units} flour for $${totalCost}.`);
+  return true;
+}
+
+// Make Dough (1 flour -> 1 dough, up to serving capacity)
+function makeDough(units = 1) {
+  const maxDough = gameState.servingCapacity;
+  let made = 0;
+  for (let i = 0; i < units; i++) {
+    if (gameState.inventory.flour < 1) {
+      logEvent('Not enough flour to make more dough.');
+      break;
+    }
+    if (gameState.inventory.dough >= maxDough) {
+      logEvent('Cannot make more dough: storage is full (serving capacity limit).');
+      break;
+    }
+    gameState.inventory.flour -= 1;
+    gameState.inventory.dough += 1;
+    made++;
+  }
+  if (made > 0) {
+    logEvent(`Made ${made} dough (used ${made} flour).`);
+  }
+  return made;
+}
+
+// --- Day Phase Logic (MVP) ---
+
+// Simulate the Day Phase: serve up to servingCapacity customers
+function runDayPhase() {
+  if (gameState.phase !== 'day') {
+    logEvent('Cannot run Day Phase: not in day phase.');
+    return;
+  }
+  const maxCustomers = gameState.servingCapacity;
+  let customersServed = 0;
+  let slicesSold = 0;
+  for (let i = 0; i < maxCustomers; i++) {
+    if (gameState.inventory.dough < 1) {
+      logEvent('Out of dough! Cannot serve more customers.');
+      break;
+    }
+    // MVP: 50% chance customer buys a slice
+    const buys = Math.random() < 0.5;
+    if (buys) {
+      gameState.inventory.dough -= 1;
+      gameState.cash += 10; // MVP: fixed price per slice
+      slicesSold++;
+      logEvent(`Customer ${i + 1}: Bought a slice! (+$10)`);
+    } else {
+      logEvent(`Customer ${i + 1}: Did not buy.`);
+    }
+    customersServed++;
+  }
+  logEvent(`Day ended: Served ${customersServed} customers, sold ${slicesSold} slices.`);
+  toEndOfDayPhase();
+}
+
+// --- End-of-Day Phase Logic (MVP) ---
+
+function runEndOfDayPhase() {
+  if (gameState.phase !== 'endOfDay') {
+    logEvent('Cannot run End-of-Day Phase: not in endOfDay phase.');
+    return;
+  }
+  // Health loss
+  gameState.health -= 1;
+  logEvent('Lost 1 health from daily grind.');
+
+  // Dough spoilage
+  const wastedDough = gameState.inventory.dough;
+  gameState.inventory.dough = 0;
+  if (wastedDough > 0) {
+    logEvent(`Wasted ${wastedDough} dough (spoiled overnight).`);
+  }
+
+  // Advance day
+  gameState.day += 1;
+  logEvent('A new day begins!');
+
+  // Game over check
+  if (gameState.health <= 0) {
+    logEvent('Game Over: You ran out of health!');
+    // (MVP: No restart logic yet)
+    return;
+  }
+
+  // Transition to Management Phase
+  toManagementPhase();
+} 
