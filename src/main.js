@@ -16,18 +16,25 @@ appRoot.innerHTML = `
     <section class="panel panel-stats">
       <div class="stats-block">
         <h2>Stats</h2>
-        <ul>
-          <li>Cash: $___</li>
-          <li>Health: ___</li>
-          <li>Reputation: ___</li>
-          <li>Day: ___</li>
-          <li>Serving Capacity: ___</li>
+        <ul id="stats-list">
+          <li>Cash: $<span id="stat-cash">___</span></li>
+          <li>Health: <span id="stat-health">___</span></li>
+          <li>Reputation: <span id="stat-rep">___</span></li>
+          <li>Day: <span id="stat-day">___</span></li>
+          <li>Serving Capacity: <span id="stat-capacity">___</span></li>
+          <li>Flour: <span id="stat-flour">___</span></li>
+          <li>Dough: <span id="stat-dough">___</span></li>
         </ul>
       </div>
       <div class="actions-block">
         <h2>Actions</h2>
+        <div style="margin-bottom: 0.5rem;">
+          <input id="buy-flour-qty" type="number" min="1" value="1" style="width: 3em;"> 
+          <button id="buy-flour-btn">Buy Flour ($5 each)</button>
+        </div>
+        <button id="start-day-btn">Start Day</button>
+        <span id="timer-display" style="margin-left: 1em; font-weight: bold;"></span>
         <button disabled>Make Dough</button>
-        <button disabled>Start Day</button>
         <button disabled>Recycle</button>
         <button disabled>Order Pizza</button>
         <button disabled>Lift Weights</button>
@@ -116,6 +123,7 @@ function addHealth(amount) {
   if (gameState.health > 100) gameState.health = 100;
   if (gameState.health < 0) gameState.health = 0;
   logEvent(`Health: ${prev} → ${gameState.health} (${amount >= 0 ? '+' : ''}${amount})`);
+  recalculateServingCapacity();
 }
 
 // Order Pizza: Spend $22 to restore 10 health (up to max 100)
@@ -142,6 +150,7 @@ function logEvent(message) {
 // Transition to Management Phase
 function toManagementPhase() {
   gameState.phase = 'management';
+  recalculateServingCapacity();
   logEvent('Entered Management Phase. Plan your next day!');
   // (Future: enable management actions, update UI, etc.)
 }
@@ -203,9 +212,47 @@ function makeDough(units = 1) {
   return made;
 }
 
-// --- Day Phase Logic (MVP) ---
+// --- Serving Capacity Calculation (MVP) ---
+function recalculateServingCapacity() {
+  const h = gameState.health;
+  let cap = 1;
+  if (h >= 90) cap = 10;
+  else if (h >= 80) cap = 9;
+  else if (h >= 70) cap = 8;
+  else if (h >= 60) cap = 7;
+  else if (h >= 50) cap = 6;
+  else if (h >= 40) cap = 5;
+  else if (h >= 30) cap = 4;
+  else if (h >= 20) cap = 3;
+  else if (h >= 10) cap = 2;
+  else if (h >= 1) cap = 1;
+  else cap = 0;
+  gameState.servingCapacity = cap;
+  updateStatsUI();
+}
 
-// Simulate the Day Phase: serve up to servingCapacity customers
+// --- Simple Customer Logic (MVP) ---
+function processCustomerEvent(customerNumber) {
+  if (gameState.inventory.dough < 1) {
+    logEvent('Out of dough! Cannot serve more customers.');
+    return false;
+  }
+  // MVP: 50% chance customer buys a slice
+  const buys = Math.random() < 0.5;
+  if (buys) {
+    gameState.inventory.dough -= 1;
+    addCash(10); // MVP: fixed price per slice
+    gameState.reputation = Math.max(0, gameState.reputation + 1); // +1 rep per sale
+    updateStatsUI();
+    logEvent(`Customer ${customerNumber}: Bought a slice! (+$10, +1 Rep)`);
+    return true;
+  } else {
+    logEvent(`Customer ${customerNumber}: Did not buy.`);
+    return false;
+  }
+}
+
+// Refactor runDayPhase to use processCustomerEvent
 function runDayPhase() {
   if (gameState.phase !== 'day') {
     logEvent('Cannot run Day Phase: not in day phase.');
@@ -219,15 +266,8 @@ function runDayPhase() {
       logEvent('Out of dough! Cannot serve more customers.');
       break;
     }
-    // MVP: 50% chance customer buys a slice
-    const buys = Math.random() < 0.5;
-    if (buys) {
-      gameState.inventory.dough -= 1;
-      addCash(10); // MVP: fixed price per slice
+    if (processCustomerEvent(i + 1)) {
       slicesSold++;
-      logEvent(`Customer ${i + 1}: Bought a slice! (+$10)`);
-    } else {
-      logEvent(`Customer ${i + 1}: Did not buy.`);
     }
     customersServed++;
   }
@@ -276,4 +316,73 @@ window.toDayPhase = toDayPhase;
 window.runDayPhase = runDayPhase;
 window.runEndOfDayPhase = runEndOfDayPhase;
 window.toManagementPhase = toManagementPhase;
-window.gameState = gameState; 
+window.gameState = gameState;
+
+// --- Timer State ---
+let dayTimerInterval = null;
+let dayTimerSeconds = 0;
+
+// --- UI Update Helpers ---
+function updateStatsUI() {
+  document.getElementById('stat-cash').textContent = gameState.cash;
+  document.getElementById('stat-health').textContent = gameState.health;
+  document.getElementById('stat-rep').textContent = gameState.reputation;
+  document.getElementById('stat-day').textContent = gameState.day;
+  document.getElementById('stat-capacity').textContent = gameState.servingCapacity;
+  document.getElementById('stat-flour').textContent = gameState.inventory.flour;
+  document.getElementById('stat-dough').textContent = gameState.inventory.dough;
+  updateStartDayButton();
+}
+
+function updateStartDayButton() {
+  const btn = document.getElementById('start-day-btn');
+  // Enable only in management phase and if at least 1 dough
+  btn.disabled = !(gameState.phase === 'management' && gameState.inventory.dough > 0);
+}
+
+function updateTimerDisplay(seconds) {
+  const el = document.getElementById('timer-display');
+  if (seconds > 0) {
+    el.textContent = `Day in progress: ${seconds}s left...`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+// Initial UI update
+updateStatsUI();
+
+// --- Buy Flour Button Logic ---
+document.getElementById('buy-flour-btn').addEventListener('click', () => {
+  const qty = parseInt(document.getElementById('buy-flour-qty').value, 10) || 1;
+  buyFlour(qty);
+  updateStatsUI();
+});
+
+// --- Start Day Button Logic ---
+document.getElementById('start-day-btn').addEventListener('click', () => {
+  if (gameState.phase !== 'management' || gameState.inventory.dough < 1) return;
+  toDayPhase();
+  startDayTimer();
+  updateStatsUI();
+});
+
+function startDayTimer() {
+  dayTimerSeconds = 20;
+  updateTimerDisplay(dayTimerSeconds);
+  document.getElementById('start-day-btn').disabled = true;
+  dayTimerInterval = setInterval(() => {
+    dayTimerSeconds--;
+    updateTimerDisplay(dayTimerSeconds);
+    if (dayTimerSeconds <= 0) {
+      clearInterval(dayTimerInterval);
+      dayTimerInterval = null;
+      updateTimerDisplay(0);
+      runDayPhase();
+      updateStatsUI();
+    }
+  }, 1000);
+}
+
+// Update stats UI after any state-changing action (for now, call manually after actions)
+// In a full implementation, you would call updateStatsUI after every relevant action. 

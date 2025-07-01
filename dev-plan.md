@@ -26,14 +26,14 @@ This plan breaks down the project into small, self-contained tasks. Each step is
 - [x] Add state update logic for each phase
 
 ## 4. Core Resource Systems
-- [ ] Implement Cash and Health state and update logic
-- [ ] Add Inventory system for Flour and Dough
-- [ ] Implement Make Dough action (consumes Flour, produces Dough)
-- [ ] Add UI for buying Flour and showing inventory
+- [x] Implement Cash and Health state and update logic
+- [x] Add Inventory system for Flour and Dough
+- [x] Implement Make Dough action (consumes Flour, produces Dough)
+- [x] Add UI for buying Flour and showing inventory
 
 ## 5. Basic Customer & Day Cycle
-- [ ] Implement simple customer logic (random buy/no-buy outcome)
-- [ ] Add Reputation and Serving Capacity basics
+- [x] Implement simple customer logic (random buy/no-buy outcome)
+- [x] Add Reputation and Serving Capacity basics
 - [ ] Implement Start Day button and 20-second timer
 - [ ] Enforce ingredient requirements and serving capacity during Day phase
 
@@ -59,6 +59,13 @@ This plan breaks down the project into small, self-contained tasks. Each step is
 - [ ] Playtest each feature as it's added
 - [ ] Refactor and fix bugs as needed
 - [ ] Prepare for next feature chunk based on feedback
+
+## UI/UX & Refactor TODOs
+
+- Move “Buy Flour” button into the Ingredients Table (right panel) when implemented.
+- Remove Flour and Dough from Stats panel once Ingredients Table is live.
+- Increase or make flexible the width of the right panel to fit full ingredients/supplies tables.
+- Refactor business log to support multiple message types (customer events, daily summary, game over, etc.) as components with unique styles.
 
 ---
 
