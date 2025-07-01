@@ -101,6 +101,37 @@ const gameState = {
   staff: 0,
 };
 
+// --- Core Resource System: Cash & Health ---
+
+function addCash(amount) {
+  const prev = gameState.cash;
+  gameState.cash += amount;
+  if (gameState.cash < 0) gameState.cash = 0; // No debt for MVP
+  logEvent(`Cash: ${prev} → ${gameState.cash} (${amount >= 0 ? '+' : ''}${amount})`);
+}
+
+function addHealth(amount) {
+  const prev = gameState.health;
+  gameState.health += amount;
+  if (gameState.health > 100) gameState.health = 100;
+  if (gameState.health < 0) gameState.health = 0;
+  logEvent(`Health: ${prev} → ${gameState.health} (${amount >= 0 ? '+' : ''}${amount})`);
+}
+
+// Order Pizza: Spend $22 to restore 10 health (up to max 100)
+function orderPizza() {
+  const pizzaCost = 22;
+  const healthRestore = 10;
+  if (gameState.cash < pizzaCost) {
+    logEvent('Not enough cash to order pizza.');
+    return false;
+  }
+  addCash(-pizzaCost);
+  addHealth(healthRestore);
+  logEvent('Ordered pizza for self. Restored 10 health.');
+  return true;
+}
+
 // --- Phase Transition & State Update Logic ---
 
 // Helper: Add a message to the business log
@@ -143,7 +174,7 @@ function buyFlour(units = 1) {
     logEvent(`Not enough cash to buy ${units} flour.`);
     return false;
   }
-  gameState.cash -= totalCost;
+  addCash(-totalCost);
   gameState.inventory.flour += units;
   logEvent(`Bought ${units} flour for $${totalCost}.`);
   return true;
@@ -192,7 +223,7 @@ function runDayPhase() {
     const buys = Math.random() < 0.5;
     if (buys) {
       gameState.inventory.dough -= 1;
-      gameState.cash += 10; // MVP: fixed price per slice
+      addCash(10); // MVP: fixed price per slice
       slicesSold++;
       logEvent(`Customer ${i + 1}: Bought a slice! (+$10)`);
     } else {
@@ -212,7 +243,7 @@ function runEndOfDayPhase() {
     return;
   }
   // Health loss
-  gameState.health -= 1;
+  addHealth(-1);
   logEvent('Lost 1 health from daily grind.');
 
   // Dough spoilage
