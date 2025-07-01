@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Place Tycoon - Color Palette</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #F8F8F8;
+            color: #1E1E1E;
+            padding: 2rem;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #FF6347;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #D87093;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .color-card {
+            background: #FFFFFF;
+            border: 2px solid #FFF1E0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .color-swatch {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .color-info {
+            padding: 1rem;
+        }
+
+        .color-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .color-hex {
+            font-family: 'VT323', monospace;
+            background: #FFF1E0;
+            padding: 0.25rem 0.5rem;
+            border: 2px solid #1E1E1E;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .color-usage {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            opacity: 0.8;
+        }
+
+        .usage-examples {
+            margin-top: 2rem;
+            background: #FFFFFF;
+            border: 2px solid #FFF1E0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .usage-examples h2 {
+            color: #FF6347;
+            margin-top: 0;
+        }
+
+        .example-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .example-section h3 {
+            color: #D87093;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-item {
+            margin-bottom: 0.25rem;
+            padding-left: 1rem;
+        }
+
+        /* Color-specific styles */
+        .bg-ivory { background-color: #F8F8F8; color: #1E1E1E; }
+        .bg-white { background-color: #FFFFFF; color: #1E1E1E; }
+        .bg-charcoal { background-color: #1E1E1E; color: #F8F8F8; }
+        .bg-beige { background-color: #FFF1E0; color: #1E1E1E; }
+        .bg-red { background-color: #FF6347; color: #FFFFFF; }
+        .bg-yellow { background-color: #FFEA61; color: #1E1E1E; }
+        .bg-rosy { background-color: #D87093; color: #FFFFFF; }
+        .bg-green { background-color: #6AAA64; color: #FFFFFF; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍕 Pizza Place Tycoon</h1>
+        <div class="subtitle">Nostalgic • Minimalist • Quirky Retro Business Sim</div>
+        
+        <div class="palette-grid">
+            <div class="color-card">
+                <div class="color-swatch bg-ivory">Background Ivory</div>
+                <div class="color-info">
+                    <div class="color-name">Background Ivory</div>
+                    <div class="color-hex">#F8F8F8</div>
+                    <div class="color-usage">Soft, off-white canvas for main backgrounds</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch bg-white">Panel White</div>
+                <div class="color-info">
+                    <div class="color-name">Panel White</div>
+                    <div class="color-hex">#FFFFFF</div>
+                    <div class="color-usage">Clean card and panel backgrounds</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch bg-charcoal">Text Dark Charcoal</div>
+                <div class="color-info">
+                    <div class="color-name">Text Dark Charcoal</div>
+                    <div class="color-hex">#1E1E1E</div>
+                    <div class="color-usage">High‑contrast pixel text, primary content</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch bg-beige">Crust Light Beige</div>
+                <div class="color-info">
+                    <div class="color-name">Crust Light Beige</div>
+                    <div class="color-hex">#FFF1E0</div>
+                    <div class="color-usage">Neutral for buttons, meters, subtle backgrounds</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch bg-red">Sauce Soft Red</div>
+                <div class="color-info">
+                    <div class="color-name">Sauce Soft Red</div>
+                    <div class="color-hex">#FF6347</div>
+                    <div class="color-usage">Alerts, active buttons, error states</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch bg-yellow">Cheese Soft Yellow</div>
+                <div class="color-info">
+                    <div class="color-name">Cheese Soft Yellow</div>
+                    <div class="color-hex">#FFEA61</div>
+                    <div class="color-usage">Progress fills, highlights, success indicators</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch bg-rosy">Pepperoni Rosy</div>
+                <div class="color-info">
+                    <div class="color-name">Pepperoni Rosy</div>
+                    <div class="color-hex">#D87093</div>
+                    <div class="color-usage">Secondary accents, notifications, selected states</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch bg-green">Basil Soft Green</div>
+                <div class="color-info">
+                    <div class="color-name">Basil Soft Green</div>
+                    <div class="color-hex">#6AAA64</div>
+                    <div class="color-usage">Positive indicators, success messages</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="usage-examples">
+            <h2>Usage Examples</h2>
+            
+            <div class="example-section">
+                <h3>Layout Structure</h3>
+                <div class="example-item">• Main Background: Background Ivory (#F8F8F8)</div>
+                <div class="example-item">• Panel Backgrounds: Panel White (#FFFFFF)</div>
+                <div class="example-item">• All Text: Text Dark Charcoal (#1E1E1E)</div>
+            </div>
+
+            <div class="example-section">
+                <h3>Interactive Elements</h3>
+                <div class="example-item">• Default Buttons: Crust Light Beige (#FFF1E0) + Dark Charcoal text</div>
+                <div class="example-item">• Active/Hover: Sauce Soft Red (#FF6347) + White text</div>
+                <div class="example-item">• Disabled: Lighter tint of Crust Beige + reduced opacity</div>
+            </div>
+
+            <div class="example-section">
+                <h3>Progress & Meters</h3>
+                <div class="example-item">• Dough Progress: Crust Light Beige (#FFF1E0)</div>
+                <div class="example-item">• Success Progress: Cheese Soft Yellow (#FFEA61)</div>
+                <div class="example-item">• Health/Important: Pepperoni Rosy (#D87093)</div>
+                <div class="example-item">• Positive Actions: Basil Soft Green (#6AAA64)</div>
+            </div>
+
+            <div class="example-section">
+                <h3>Feedback & States</h3>
+                <div class="example-item">• Errors/Alerts: Sauce Soft Red (#FF6347)</div>
+                <div class="example-item">• Success Messages: Basil Soft Green (#6AAA64)</div>
+                <div class="example-item">• Highlights: Cheese Soft Yellow (#FFEA61)</div>
+                <div class="example-item">• Secondary Info: Pepperoni Rosy (#D87093)</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

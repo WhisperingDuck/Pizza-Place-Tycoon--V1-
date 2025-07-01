@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Place Tycoon - UI Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #F8F8F8; /* Background Ivory */
+            color: #1E1E1E; /* Text Dark Charcoal */
+            line-height: 1.4;
+        }
+
+        /* Header Bar */
+        .header {
+            background: #FFFFFF; /* Panel White */
+            border-bottom: 3px solid #8B4513; /* Sauce Brown */
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 60px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            color: #8B4513; /* Sauce Brown */
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 16px;
+        }
+
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+            background: #CD853F; /* Pizza Gold */
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Main Layout - Three Column Grid */
+        .main-container {
+            display: grid;
+            grid-template-columns: 30% 40% 30%;
+            grid-template-rows: 1fr;
+            height: calc(100vh - 60px);
+            gap: 2px;
+            background: #8B4513; /* Sauce Brown */
+            padding: 2px;
+        }
+
+        /* Business Log (Left Column) */
+        .business-log {
+            background: #FFFFFF; /* Panel White */
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .log-entry {
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .log-entry.success {
+            background: #6AAA64; /* Basil Soft Green */
+            color: #1E1E1E;
+        }
+
+        .log-entry.error {
+            background: #FF6347; /* Sauce Soft Red */
+            color: #1E1E1E;
+        }
+
+        .log-entry.customer {
+            background: #FFEA61; /* Cheese Soft Yellow */
+            color: #1E1E1E;
+        }
+
+        .daily-summary {
+            background: #F8F8F8; /* Background Ivory */
+            border: 2px solid #8B4513; /* Sauce Brown */
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        /* Middle Column */
+        .middle-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        /* Action Panel */
+        .action-panel {
+            background: #FFFFFF; /* Panel White */
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-button {
+            background: #FFF1E0; /* Crust Light Beige */
+            border: 2px solid #8B4513; /* Sauce Brown */
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-button:hover {
+            background: #FF6347; /* Sauce Soft Red */
+            color: white;
+        }
+
+        .action-button:disabled {
+            background: #D3D3D3;
+            color: #808080;
+            cursor: not-allowed;
+        }
+
+        .meter-button {
+            min-width: 120px;
+        }
+
+        .meter-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #6AAA64; /* Basil Soft Green */
+            transition: width 0.1s linear;
+        }
+
+        /* Inventory Panel */
+        .inventory-panel {
+            background: #FFFFFF; /* Panel White */
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .panel-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            background: #F8F8F8; /* Background Ivory */
+            border: 2px solid #8B4513; /* Sauce Brown */
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background: #FFFFFF; /* Panel White */
+            border-bottom: 2px solid #FFFFFF;
+        }
+
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .inventory-table th,
+        .inventory-table td {
+            padding: 6px;
+            text-align: left;
+            border-bottom: 1px solid #FFF1E0; /* Crust Light Beige */
+        }
+
+        .inventory-table tr:nth-child(even) {
+            background: #F8F8F8; /* Background Ivory */
+        }
+
+        .buy-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .buy-button {
+            background: #6AAA64; /* Basil Soft Green */
+            border: 1px solid #228B22;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        /* Upgrades Panel */
+        .upgrades-panel {
+            background: #FFFFFF; /* Panel White */
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .upgrade-card {
+            background: #F8F8F8; /* Background Ivory */
+            border: 2px solid #FFF1E0; /* Crust Light Beige */
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .upgrade-card.available {
+            border-color: #6AAA64; /* Basil Soft Green */
+        }
+
+        .upgrade-card.purchased {
+            border-color: #CD853F; /* Pizza Gold */
+            background: #FFF8DC; /* Cornsilk */
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .upgrade-description {
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .upgrade-price {
+            font-size: 12px;
+            color: #CD853F; /* Pizza Gold */
+            font-weight: bold;
+        }
+
+        .purchase-button {
+            background: #6AAA64; /* Basil Soft Green */
+            border: 1px solid #228B22;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Game Status Panel (Right Column) */
+        .game-status {
+            background: #FFFFFF; /* Panel White */
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .status-meter {
+            background: #F8F8F8; /* Background Ivory */
+            border: 2px solid #FFF1E0; /* Crust Light Beige */
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .meter-label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 20px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .health-meter .meter-fill {
+            background: #FF6347; /* Sauce Soft Red */
+        }
+
+        .dough-meter .meter-fill {
+            background: #FFF1E0; /* Crust Light Beige */
+        }
+
+        .skill-meter .meter-fill {
+            background: #6AAA64; /* Basil Soft Green */
+        }
+
+        .recycling-meter .meter-fill {
+            background: #32CD32; /* Lime Green */
+        }
+
+        .level-meter .meter-fill {
+            background: #CD853F; /* Pizza Gold */
+        }
+
+        .meter-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #1E1E1E;
+        }
+
+        /* Staff Section */
+        .staff-section {
+            background: #F8F8F8; /* Background Ivory */
+            border: 2px solid #FFF1E0; /* Crust Light Beige */
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .staff-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .staff-button {
+            background: #6AAA64; /* Basil Soft Green */
+            border: 1px solid #228B22;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .fire-button {
+            background: #FF6347; /* Sauce Soft Red */
+            border: 1px solid #DC143C;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+            
+            .business-log {
+                grid-column: 1;
+                grid-row: 1 / 3;
+            }
+            
+            .middle-column {
+                grid-column: 2;
+                grid-row: 1;
+            }
+            
+            .game-status {
+                grid-column: 2;
+                grid-row: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            
+            .business-log,
+            .middle-column,
+            .game-status {
+                grid-column: 1;
+            }
+        }
+
+        /* Call to Attention Animation */
+        .call-to-attention {
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 20px #FFD700;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6AAA64; /* Basil Soft Green */
+            border: 2px solid #228B22;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: #FFFFFF; /* Panel White */
+            border: 3px solid #8B4513; /* Sauce Brown */
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            background: #FFF1E0; /* Crust Light Beige */
+            border: 2px solid #8B4513; /* Sauce Brown */
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+        }
+
+        .modal-button:hover {
+            background: #FF6347; /* Sauce Soft Red */
+            color: white;
+        }
+
+        /* Quality Score Display */
+        .quality-score {
+            background: #F8F8F8; /* Background Ivory */
+            border: 2px solid #FFF1E0; /* Crust Light Beige */
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .quality-stars {
+            display: flex;
+            gap: 2px;
+            margin-top: 5px;
+        }
+
+        .star {
+            color: #FFD700;
+            font-size: 16px;
+        }
+
+        .star.empty {
+            color: #D3D3D3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Bar -->
+    <header class="header">
+        <div class="logo">
+            <h1>Pizza Place Tycoon</h1>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-icon">$</div>
+                <span>$1,247</span>
+            </div>
+            <div class="stat">
+                <div class="stat-icon">H</div>
+                <span>75</span>
+            </div>
+            <div class="stat">
+                <div class="stat-icon">R</div>
+                <span>12</span>
+            </div>
+            <div class="stat">
+                <div class="stat-icon">L</div>
+                <span>Level 8</span>
+            </div>
+            <div class="stat">
+                <div class="stat-icon">P</div>
+                <span>$2.50/slice</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Interface -->
+    <div class="main-container">
+        <!-- Business Log (Left Column) -->
+        <div class="business-log">
+            <h3>Business Log</h3>
+            <div class="log-entry">Day 15 - Management Phase</div>
+            <div class="log-entry success">+1 Dough</div>
+            <div class="log-entry customer">Delighted customer ordered a slice with Pepperoni, Mushroom</div>
+            <div class="log-entry">Recycled 25 units for $28</div>
+            <div class="log-entry error">-1 Health (daily toll)</div>
+            
+            <div class="daily-summary">
+                <h4>End of Day 14</h4>
+                <p>Traffic: 15 customers</p>
+                <p>Slices Sold: 8 (+2 from previous day)</p>
+                <p>Income: $24.50 (+$6.25 from previous day)</p>
+                <p>Reputation: 12 (+1)</p>
+                <p>Health: 75 (-1)</p>
+                <p>Wasted Dough: 0.5</p>
+            </div>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="middle-column">
+            <!-- Action Panel -->
+            <div class="action-panel">
+                <button class="action-button meter-button">
+                    Make Dough
+                    <div class="meter-progress" style="width: 60%;"></div>
+                </button>
+                <button class="action-button meter-button">
+                    Start Day
+                    <div class="meter-progress" style="width: 0%;"></div>
+                </button>
+                <button class="action-button">Order Pizza</button>
+                <button class="action-button" disabled>End Day</button>
+                <button class="action-button">Recycle</button>
+                <button class="action-button meter-button">
+                    Lift Weights
+                    <div class="meter-progress" style="width: 25%;"></div>
+                </button>
+                <button class="action-button">Hire Staff</button>
+            </div>
+
+            <!-- Inventory Panel -->
+            <div class="inventory-panel">
+                <div class="panel-tabs">
+                    <div class="tab active">Ingredients</div>
+                    <div class="tab">Supplies</div>
+                </div>
+                
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Buy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Flour</td>
+                            <td>2.5</td>
+                            <td>$2.00</td>
+                            <td>
+                                <div class="buy-controls">
+                                    <button class="buy-button">x1</button>
+                                    <button class="buy-button">x5</button>
+                                    <button class="buy-button">x10</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sauce</td>
+                            <td>1.25</td>
+                            <td>$1.00</td>
+                            <td>
+                                <div class="buy-controls">
+                                    <button class="buy-button">x1</button>
+                                    <button class="buy-button">x5</button>
+                                    <button class="buy-button">x10</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cheese</td>
+                            <td>3.0</td>
+                            <td>$1.00</td>
+                            <td>
+                                <div class="buy-controls">
+                                    <button class="buy-button">x1</button>
+                                    <button class="buy-button">x5</button>
+                                    <button class="buy-button">x10</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Pepperoni [BOOSTED]</td>
+                            <td>2.0</td>
+                            <td>$2.50</td>
+                            <td>
+                                <div class="buy-controls">
+                                    <button class="buy-button">x1</button>
+                                    <button class="buy-button">x5</button>
+                                    <button class="buy-button">x10</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Upgrades Panel -->
+            <div class="upgrades-panel">
+                <div class="panel-tabs">
+                    <div class="tab active">Kitchen</div>
+                    <div class="tab">Restaurant</div>
+                    <div class="tab">Perks</div>
+                </div>
+                
+                <div class="upgrade-card available">
+                    <div class="upgrade-name">Clean Microwave</div>
+                    <div class="upgrade-description">Cleaning this thing couldn't hurt. Buy some cleaning supplies.</div>
+                    <div class="upgrade-price">$10</div>
+                    <button class="purchase-button">Purchase</button>
+                </div>
+                
+                <div class="upgrade-card">
+                    <div class="upgrade-name">Second Microwave</div>
+                    <div class="upgrade-description">Two is better than one.</div>
+                    <div class="upgrade-price">$40</div>
+                    <button class="purchase-button" disabled>Locked (Level 3)</button>
+                </div>
+                
+                <div class="upgrade-card purchased">
+                    <div class="upgrade-name">Microwave</div>
+                    <div class="upgrade-description">Required to start the day cycle.</div>
+                    <div class="upgrade-price">$15</div>
+                    <button class="purchase-button" disabled>Purchased</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Status Panel (Right Column) -->
+        <div class="game-status">
+            <!-- Quality Score Display -->
+            <div class="quality-score">
+                <div class="meter-label">Quality Score</div>
+                <div class="quality-stars">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                </div>
+                <div style="font-size: 12px; margin-top: 5px;">Disgust: 15</div>
+            </div>
+
+            <div class="status-meter health-meter">
+                <div class="meter-label">Health</div>
+                <div class="meter-bar">
+                    <div class="meter-fill" style="width: 75%;"></div>
+                    <div class="meter-text">75/100</div>
+                </div>
+            </div>
+            
+            <div class="status-meter dough-meter">
+                <div class="meter-label">Dough</div>
+                <div class="meter-bar">
+                    <div class="meter-fill" style="width: 40%;"></div>
+                    <div class="meter-text">3.2/8</div>
+                </div>
+            </div>
+            
+            <div class="status-meter skill-meter">
+                <div class="meter-label">Skill</div>
+                <div class="meter-bar">
+                    <div class="meter-fill" style="width: 65%;"></div>
+                    <div class="meter-text">Level 3 (65/100)</div>
+                </div>
+            </div>
+            
+            <div class="status-meter recycling-meter">
+                <div class="meter-label">Recycling</div>
+                <div class="meter-bar">
+                    <div class="meter-fill" style="width: 15%;"></div>
+                    <div class="meter-text">15/100</div>
+                </div>
+            </div>
+            
+            <div class="status-meter level-meter">
+                <div class="meter-label">Level Progress</div>
+                <div class="meter-bar">
+                    <div class="meter-fill" style="width: 80%;"></div>
+                    <div class="meter-text">80/100 slices</div>
+                </div>
+            </div>
+            
+            <div class="staff-section">
+                <div class="meter-label">Staff (2/10)</div>
+                <div class="staff-controls">
+                    <button class="staff-button">Hire (+$15/day)</button>
+                    <button class="staff-button fire-button">Fire (-1 Rep)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Example -->
+    <div class="toast" style="display: none;">
+        Game Saved!
+    </div>
+
+    <!-- Modal Example -->
+    <div class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>Prestige Available!</h3>
+            <p>Your cash register overflows. The old microwave? You now use it just to store extra cash. Looking down at the final slice of the day, you realize it's getting a little stale. You have enough cash to ensure you and your employees can enjoy the rest of your lives. It might be time to hand the keys to the next pizza freak.</p>
+            <div class="modal-buttons">
+                <button class="modal-button">Prestige</button>
+                <button class="modal-button">Keep Playing</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate meter animations
+            const meters = document.querySelectorAll('.meter-progress');
+            meters.forEach(meter => {
+                if (meter.style.width !== '0%') {
+                    setInterval(() => {
+                        const currentWidth = parseFloat(meter.style.width);
+                        if (currentWidth < 100) {
+                            meter.style.width = (currentWidth + 1) + '%';
+                        }
+                    }, 100);
+                }
+            });
+
+            // Demo toast notification
+            setTimeout(() => {
+                const toast = document.querySelector('.toast');
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }, 2000);
+
+            // Demo call to attention
+            const makeDoughButton = document.querySelector('.action-button');
+            makeDoughButton.classList.add('call-to-attention');
+            setTimeout(() => {
+                makeDoughButton.classList.remove('call-to-attention');
+            }, 5000);
+        });
+    </script>
+</body>
+</html> 

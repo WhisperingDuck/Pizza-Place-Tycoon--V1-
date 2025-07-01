@@ -1,0 +1,219 @@
+/* Pizza Place Tycoon Base Styles & Color Palette */
+
+:root {
+  --background-ivory: #F8F8F8;
+  --panel-white: #FFFFFF;
+  --text-dark-charcoal: #1E1E1E;
+  --crust-light-beige: #FFF1E0;
+  --sauce-soft-red: #FF6347;
+  --cheese-soft-yellow: #FFEA61;
+  --pepperoni-rosy: #D87093;
+  --basil-soft-green: #6AAA64;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--background-ivory);
+  color: var(--text-dark-charcoal);
+  font-family: 'VT323', monospace, monospace;
+  font-size: 20px;
+  box-sizing: border-box;
+}
+
+#app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Import VT323 font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Basic panel/card styling */
+.panel {
+  background: var(--panel-white);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(30,30,30,0.04);
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* Utility classes for color accents */
+.bg-crust { background: var(--crust-light-beige); }
+.bg-sauce { background: var(--sauce-soft-red); }
+.bg-cheese { background: var(--cheese-soft-yellow); }
+.bg-pepperoni { background: var(--pepperoni-rosy); }
+.bg-basil { background: var(--basil-soft-green); }
+
+.text-sauce { color: var(--sauce-soft-red); }
+.text-cheese { color: var(--cheese-soft-yellow); }
+.text-pepperoni { color: var(--pepperoni-rosy); }
+.text-basil { color: var(--basil-soft-green); }
+
+/* Responsive base styles */
+@media (max-width: 700px) {
+  body {
+    font-size: 16px;
+  }
+  .panel {
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+  }
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--crust-light-beige);
+  padding: 0.5rem 1.5rem;
+  border-bottom: 2px solid var(--panel-white);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-title {
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.header-btn {
+  background: var(--panel-white);
+  color: var(--text-dark-charcoal);
+  border: 1px solid var(--crust-light-beige);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.header-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.main-content.panels-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 70vh;
+}
+
+.panel {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.panel-stats {
+  max-width: 260px;
+}
+.panel-log {
+  flex: 2 1 0;
+  min-width: 320px;
+  max-width: 600px;
+}
+.panel-tabs {
+  max-width: 340px;
+}
+
+.stats-block, .actions-block, .staff-block {
+  margin-bottom: 1.2rem;
+}
+
+.log-scroll-area {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  background: var(--crust-light-beige);
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  min-height: 120px;
+  max-height: 300px;
+}
+
+.tabs-header {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.tab-btn {
+  flex: 1 1 0;
+  background: var(--cheese-soft-yellow);
+  color: var(--text-dark-charcoal);
+  border: none;
+  border-radius: 4px 4px 0 0;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.tab-btn:disabled {
+  opacity: 0.4;
+}
+.tab-content {
+  background: var(--panel-white);
+  border-radius: 0 0 6px 6px;
+  padding: 0.75rem;
+  min-height: 120px;
+}
+.tab-pane {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 1000px) {
+  .main-content.panels-row {
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  .panel-stats, .panel-tabs {
+    max-width: 180px;
+  }
+  .panel-log {
+    min-width: 180px;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 700px) {
+  .main-content.panels-row {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  .panel {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 180px;
+    margin: 0 0 0.5rem 0;
+  }
+  .header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 0.5rem;
+  }
+  .header-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+  }
+  .header-controls {
+    gap: 0.2rem;
+  }
+} 
