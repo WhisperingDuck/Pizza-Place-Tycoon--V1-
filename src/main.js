@@ -266,4 +266,14 @@ function runEndOfDayPhase() {
 
   // Transition to Management Phase
   toManagementPhase();
-} 
+}
+
+// --- Expose core functions and state for console testing ---
+window.buyFlour = buyFlour;
+window.makeDough = makeDough;
+window.orderPizza = orderPizza;
+window.toDayPhase = toDayPhase;
+window.runDayPhase = runDayPhase;
+window.runEndOfDayPhase = runEndOfDayPhase;
+window.toManagementPhase = toManagementPhase;
+window.gameState = gameState; 
