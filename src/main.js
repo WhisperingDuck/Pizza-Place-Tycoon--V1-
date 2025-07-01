@@ -32,9 +32,9 @@ appRoot.innerHTML = `
           <input id="buy-flour-qty" type="number" min="1" value="1" style="width: 3em;"> 
           <button id="buy-flour-btn">Buy Flour ($5 each)</button>
         </div>
+        <button id="make-dough-btn">Make Dough</button>
         <button id="start-day-btn">Start Day</button>
         <span id="timer-display" style="margin-left: 1em; font-weight: bold;"></span>
-        <button disabled>Make Dough</button>
         <button disabled>Recycle</button>
         <button disabled>Order Pizza</button>
         <button disabled>Lift Weights</button>
@@ -64,7 +64,14 @@ appRoot.innerHTML = `
         <button class="tab-btn" disabled>Recipes</button>
       </div>
       <div class="tab-content">
-        <div class="tab-pane">[Ingredients Table Placeholder]</div>
+        <div class="tab-pane" id="upgrades-pane">
+          <h3>Upgrades</h3>
+          <div id="upgrade-microwave" style="margin-bottom: 1em;">
+            <span><strong>Clean Microwave</strong> ($50)</span>
+            <button id="buy-microwave-btn">Buy</button>
+            <span id="microwave-owned" style="color: green; display: none;">Owned</span>
+          </div>
+        </div>
         <div class="tab-pane">[Upgrades List Placeholder]</div>
         <div class="tab-pane">[Perks List Placeholder]</div>
         <div class="tab-pane">[Recipes List Placeholder]</div>
@@ -191,15 +198,10 @@ function buyFlour(units = 1) {
 
 // Make Dough (1 flour -> 1 dough, up to serving capacity)
 function makeDough(units = 1) {
-  const maxDough = gameState.servingCapacity;
   let made = 0;
   for (let i = 0; i < units; i++) {
     if (gameState.inventory.flour < 1) {
       logEvent('Not enough flour to make more dough.');
-      break;
-    }
-    if (gameState.inventory.dough >= maxDough) {
-      logEvent('Cannot make more dough: storage is full (serving capacity limit).');
       break;
     }
     gameState.inventory.flour -= 1;
@@ -208,6 +210,11 @@ function makeDough(units = 1) {
   }
   if (made > 0) {
     logEvent(`Made ${made} dough (used ${made} flour).`);
+    // Warn if dough exceeds what can be used in a day (servingCapacity * 1 dough = 8 slices per dough)
+    const maxUsefulDough = gameState.servingCapacity; // 1 dough = 8 slices, but servingCapacity is in slices, so this is a simplification for MVP
+    if (gameState.inventory.dough > maxUsefulDough) {
+      logEvent(`Warning: You have more dough than you can serve today. Some will be wasted!`);
+    }
   }
   return made;
 }
@@ -233,10 +240,13 @@ function recalculateServingCapacity() {
 
 // --- Simple Customer Logic (MVP) ---
 function processCustomerEvent(customerNumber) {
+  // Ingredient requirements (MVP: only dough required)
   if (gameState.inventory.dough < 1) {
-    logEvent('Out of dough! Cannot serve more customers.');
+    logEvent(`Customer ${customerNumber}: Could not buy (not enough dough).`);
     return false;
   }
+  // (Future: add checks for sauce, cheese, toppings here)
+
   // MVP: 50% chance customer buys a slice
   const buys = Math.random() < 0.5;
   if (buys) {
@@ -317,6 +327,12 @@ window.runDayPhase = runDayPhase;
 window.runEndOfDayPhase = runEndOfDayPhase;
 window.toManagementPhase = toManagementPhase;
 window.gameState = gameState;
+window.updateStatsUI = updateStatsUI;
+window.recalculateServingCapacity = recalculateServingCapacity;
+window.startDayTimer = startDayTimer;
+window.updateMakeDoughButton = updateMakeDoughButton;
+window.updateStartDayButton = updateStartDayButton;
+window.updateTimerDisplay = updateTimerDisplay;
 
 // --- Timer State ---
 let dayTimerInterval = null;
@@ -332,12 +348,20 @@ function updateStatsUI() {
   document.getElementById('stat-flour').textContent = gameState.inventory.flour;
   document.getElementById('stat-dough').textContent = gameState.inventory.dough;
   updateStartDayButton();
+  updateMakeDoughButton();
+  updateUpgradeUI();
 }
 
 function updateStartDayButton() {
   const btn = document.getElementById('start-day-btn');
   // Enable only in management phase and if at least 1 dough
   btn.disabled = !(gameState.phase === 'management' && gameState.inventory.dough > 0);
+}
+
+function updateMakeDoughButton() {
+  const btn = document.getElementById('make-dough-btn');
+  // Enable only in management phase and if at least 1 flour
+  btn.disabled = !(gameState.phase === 'management' && gameState.inventory.flour > 0);
 }
 
 function updateTimerDisplay(seconds) {
@@ -368,6 +392,11 @@ document.getElementById('start-day-btn').addEventListener('click', () => {
 });
 
 function startDayTimer() {
+  if (gameState.inventory.dough < 1) {
+    logEvent('Cannot start day: not enough dough.');
+    updateStatsUI();
+    return;
+  }
   dayTimerSeconds = 20;
   updateTimerDisplay(dayTimerSeconds);
   document.getElementById('start-day-btn').disabled = true;
@@ -384,5 +413,67 @@ function startDayTimer() {
   }, 1000);
 }
 
-// Update stats UI after any state-changing action (for now, call manually after actions)
-// In a full implementation, you would call updateStatsUI after every relevant action. 
+// --- Make Dough Button Logic ---
+document.getElementById('make-dough-btn').addEventListener('click', () => {
+  if (gameState.phase !== 'management' || gameState.inventory.flour < 1) return;
+  makeDough(1);
+  updateStatsUI();
+});
+
+// --- Upgrade UI Helpers ---
+function updateUpgradeUI() {
+  const btn = document.getElementById('buy-microwave-btn');
+  const owned = gameState.upgrades.cleanMicrowave;
+  const price = 50;
+  btn.disabled = owned || gameState.cash < price;
+  document.getElementById('microwave-owned').style.display = owned ? '' : 'none';
+}
+
+// --- Show Toast/Feedback for Upgrade Purchase ---
+function showUpgradeToast(message) {
+  let toast = document.getElementById('upgrade-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'upgrade-toast';
+    toast.style.position = 'absolute';
+    toast.style.right = '30px';
+    toast.style.top = '120px';
+    toast.style.background = '#FFEA61';
+    toast.style.color = '#1E1E1E';
+    toast.style.padding = '0.5em 1em';
+    toast.style.borderRadius = '6px';
+    toast.style.fontWeight = 'bold';
+    toast.style.boxShadow = '0 2px 8px rgba(30,30,30,0.10)';
+    toast.style.zIndex = 1000;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.opacity = '1';
+  toast.style.display = '';
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.5s';
+    toast.style.opacity = '0';
+    setTimeout(() => { toast.style.display = 'none'; toast.style.transition = ''; }, 500);
+  }, 2000);
+}
+
+// --- Buy Clean Microwave Button Logic ---
+document.getElementById('buy-microwave-btn').addEventListener('click', () => {
+  const price = 50;
+  if (gameState.upgrades.cleanMicrowave) return;
+  if (gameState.cash < price) return;
+  addCash(-price);
+  gameState.upgrades.cleanMicrowave = true;
+  logEvent('Purchased upgrade: Clean Microwave!');
+  showUpgradeToast('Upgrade purchased: Clean Microwave!');
+  updateUpgradeUI();
+  updateStatsUI();
+});
+
+// Update upgrade UI on stats update
+const prevUpdateStatsUI = updateStatsUI;
+updateStatsUI = function() {
+  prevUpdateStatsUI();
+  updateUpgradeUI();
+};
+window.updateStatsUI = updateStatsUI; 

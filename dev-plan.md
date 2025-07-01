@@ -34,11 +34,11 @@ This plan breaks down the project into small, self-contained tasks. Each step is
 ## 5. Basic Customer & Day Cycle
 - [x] Implement simple customer logic (random buy/no-buy outcome)
 - [x] Add Reputation and Serving Capacity basics
-- [ ] Implement Start Day button and 20-second timer
-- [ ] Enforce ingredient requirements and serving capacity during Day phase
+- [x] Implement Start Day button and 20-second timer
+- [x] Enforce ingredient requirements and serving capacity during Day phase
 
 ## 6. Upgrade System (MVP)
-- [ ] Implement single upgrade (“Clean Microwave”) and purchase logic
+- [x] Implement single upgrade (“Clean Microwave”) and purchase logic
 - [ ] Add UI for upgrade purchase and feedback
 
 ## 7. Business Log & Feedback
