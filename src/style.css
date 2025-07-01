@@ -86,8 +86,8 @@ html, body {
   gap: 0.5rem;
 }
 
-.header-btn {
-  background: var(--panel-white);
+button, .header-btn {
+  background: var(--crust-light-beige);
   color: var(--text-dark-charcoal);
   border: 1px solid var(--crust-light-beige);
   border-radius: 4px;
@@ -95,7 +95,8 @@ html, body {
   font-size: 1rem;
   padding: 0.25rem 0.75rem;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 1px 2px rgba(30,30,30,0.04);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 .header-btn:disabled {
   opacity: 0.5;
@@ -226,9 +227,6 @@ button:focus, input:focus {
 }
 
 /* Button states */
-button {
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-}
 button:hover:not(:disabled), .header-btn:hover:not(:disabled) {
   background: var(--cheese-soft-yellow);
   color: var(--text-dark-charcoal);

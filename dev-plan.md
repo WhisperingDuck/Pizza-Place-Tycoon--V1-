@@ -52,8 +52,8 @@ This plan breaks down the project into small, self-contained tasks. Each step is
 
 ## 9. UI Polish & Usability
 - [x] Add error handling and user feedback for invalid actions
-- [ ] Refine UI styling for clarity and accessibility
-- [ ] Ensure all controls are keyboard accessible
+- [x] Refine UI styling for clarity and accessibility
+- [x] Ensure all controls are keyboard accessible
 
 ## 10. Manual Testing & Iteration
 - [ ] Playtest each feature as it's added
