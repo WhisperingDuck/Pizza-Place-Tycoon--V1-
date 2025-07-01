@@ -64,4 +64,39 @@ appRoot.innerHTML = `
       </div>
     </section>
   </main>
-`; 
+`;
+
+// --- Core Game State Object ---
+// This object holds all core resources and state for the MVP loop.
+const gameState = {
+  // Player resources
+  cash: 112,            // Starting cash after recycling tutorial
+  health: 50,           // Player health (0-100)
+  reputation: 0,        // Reputation score
+  day: 1,               // Current day number
+  phase: 'management',  // 'management' | 'day' | 'endOfDay'
+
+  // Inventory
+  inventory: {
+    flour: 0,           // Units of flour
+    dough: 0,           // Units of dough (each makes 8 slices)
+    // Add more ingredients as needed
+  },
+
+  // Business stats
+  servingCapacity: 6,   // Calculated from health (for now, 50-59 = 6)
+  disgust: 100,         // Disgust score (starts at 100 due to full recycling meter)
+  recycling: 100,       // Recycling units (starts full for tutorial)
+
+  // Upgrades (MVP: only Clean Microwave)
+  upgrades: {
+    cleanMicrowave: false, // Has the player purchased the Clean Microwave?
+    // Add more upgrades as needed
+  },
+
+  // Log for business events
+  log: [],
+
+  // Staff (future, for now always 0)
+  staff: 0,
+}; 
