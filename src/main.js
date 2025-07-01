@@ -66,6 +66,11 @@ appRoot.innerHTML = `
       <div class="tab-content">
         <div class="tab-pane" id="upgrades-pane">
           <h3>Upgrades</h3>
+          <div id="upgrade-used-microwave" style="margin-bottom: 1em;">
+            <span><strong>Used Microwave</strong> ($20)</span>
+            <button id="buy-used-microwave-btn">Buy</button>
+            <span id="used-microwave-owned" style="color: green; display: none;">Owned</span>
+          </div>
           <div id="upgrade-microwave" style="margin-bottom: 1em;">
             <span><strong>Clean Microwave</strong> ($50)</span>
             <button id="buy-microwave-btn">Buy</button>
@@ -105,6 +110,7 @@ const gameState = {
   // Upgrades (MVP: only Clean Microwave)
   upgrades: {
     cleanMicrowave: false, // Has the player purchased the Clean Microwave?
+    usedMicrowave: false,   // Has the player purchased the Used Microwave?
     // Add more upgrades as needed
   },
 
@@ -113,6 +119,9 @@ const gameState = {
 
   // Staff (future, for now always 0)
   staff: 0,
+
+  // Game Over flag
+  isGameOver: false,
 };
 
 // --- Core Resource System: Cash & Health ---
@@ -160,6 +169,10 @@ function toManagementPhase() {
   recalculateServingCapacity();
   logEvent('Entered Management Phase. Plan your next day!');
   // (Future: enable management actions, update UI, etc.)
+  // If you can't afford flour, trigger game over
+  if (gameState.cash < 5) {
+    triggerGameOver('You cannot afford flour to continue your business.');
+  }
 }
 
 // Transition to Day Phase
@@ -292,6 +305,13 @@ function runEndOfDayPhase() {
     logEvent('Cannot run End-of-Day Phase: not in endOfDay phase.');
     return;
   }
+
+  // Track stats for summary
+  const prevHealth = gameState.health;
+  const prevRep = gameState.reputation;
+  const prevCash = gameState.cash;
+  const prevDough = gameState.inventory.dough;
+
   // Health loss
   addHealth(-1);
   logEvent('Lost 1 health from daily grind.');
@@ -307,10 +327,37 @@ function runEndOfDayPhase() {
   gameState.day += 1;
   logEvent('A new day begins!');
 
+  // Calculate summary stats
+  // Find last day summary in log (from runDayPhase)
+  let customersServed = 0, slicesSold = 0, cashEarned = 0;
+  for (let i = gameState.log.length - 1; i >= 0; i--) {
+    const entry = gameState.log[i];
+    if (entry.includes('Day ended:')) {
+      // Example: Day ended: Served 6 customers, sold 3 slices.
+      const match = entry.match(/Served (\d+) customers, sold (\d+) slices/);
+      if (match) {
+        customersServed = parseInt(match[1], 10);
+        slicesSold = parseInt(match[2], 10);
+      }
+      break;
+    }
+  }
+  cashEarned = gameState.cash - prevCash;
+  const healthLost = prevHealth - gameState.health;
+  const repChange = gameState.reputation - prevRep;
+
+  // Log End-of-Day summary
+  logEvent(
+    `<b>End-of-Day Summary:</b> ` +
+    `Customers served: <b>${customersServed}</b>, Slices sold: <b>${slicesSold}</b>, ` +
+    `Cash change: <b>${cashEarned >= 0 ? '+' : ''}${cashEarned}</b>, ` +
+    `Dough wasted: <b>${wastedDough}</b>, Health lost: <b>${healthLost}</b>, ` +
+    `Reputation change: <b>${repChange >= 0 ? '+' : ''}${repChange}</b>`
+  );
+
   // Game over check
   if (gameState.health <= 0) {
-    logEvent('Game Over: You ran out of health!');
-    // (MVP: No restart logic yet)
+    triggerGameOver('You ran out of health!');
     return;
   }
 
@@ -350,18 +397,38 @@ function updateStatsUI() {
   updateStartDayButton();
   updateMakeDoughButton();
   updateUpgradeUI();
+  updateLogUI();
 }
 
 function updateStartDayButton() {
   const btn = document.getElementById('start-day-btn');
-  // Enable only in management phase and if at least 1 dough
-  btn.disabled = !(gameState.phase === 'management' && gameState.inventory.dough > 0);
+  // MVP: Only allow if dough > 0 and used microwave is owned
+  const canStart = gameState.inventory.dough > 0 && gameState.upgrades.usedMicrowave;
+  btn.disabled = !canStart;
+  if (btn.disabled) {
+    if (!gameState.upgrades.usedMicrowave) {
+      btn.title = 'Requires Used Microwave';
+    } else if (gameState.inventory.dough <= 0) {
+      btn.title = 'No dough available';
+    } else {
+      btn.title = 'Unavailable';
+    }
+  } else {
+    btn.title = '';
+  }
 }
 
 function updateMakeDoughButton() {
   const btn = document.getElementById('make-dough-btn');
-  // Enable only in management phase and if at least 1 flour
-  btn.disabled = !(gameState.phase === 'management' && gameState.inventory.flour > 0);
+  const flour = gameState.inventory.flour;
+  const dough = gameState.inventory.dough;
+  // MVP: Only allow if flour > 0
+  btn.disabled = flour <= 0;
+  if (btn.disabled) {
+    btn.title = 'No flour available';
+  } else {
+    btn.title = '';
+  }
 }
 
 function updateTimerDisplay(seconds) {
@@ -378,17 +445,32 @@ updateStatsUI();
 
 // --- Buy Flour Button Logic ---
 document.getElementById('buy-flour-btn').addEventListener('click', () => {
-  const qty = parseInt(document.getElementById('buy-flour-qty').value, 10) || 1;
-  buyFlour(qty);
-  updateStatsUI();
+  try {
+    const qty = parseInt(document.getElementById('buy-flour-qty').value, 10) || 1;
+    const before = gameState.inventory.flour;
+    const success = buyFlour(qty);
+    updateStatsUI();
+    if (success) {
+      logEvent(`Purchased ${qty} flour. (Flour: ${before} → ${gameState.inventory.flour})`);
+    }
+  } catch (e) {
+    logEvent(`<span style='color:#FF6347;'><b>Error: ${e.message}</b></span>`);
+    showErrorToast('Error: ' + e.message);
+  }
 });
 
 // --- Start Day Button Logic ---
 document.getElementById('start-day-btn').addEventListener('click', () => {
-  if (gameState.phase !== 'management' || gameState.inventory.dough < 1) return;
-  toDayPhase();
-  startDayTimer();
-  updateStatsUI();
+  try {
+    if (gameState.phase !== 'management' || gameState.inventory.dough < 1 || !gameState.upgrades.usedMicrowave) return;
+    logEvent('Day started!');
+    toDayPhase();
+    startDayTimer();
+    updateStatsUI();
+  } catch (e) {
+    logEvent(`<span style='color:#FF6347;'><b>Error: ${e.message}</b></span>`);
+    showErrorToast('Error: ' + e.message);
+  }
 });
 
 function startDayTimer() {
@@ -408,6 +490,7 @@ function startDayTimer() {
       dayTimerInterval = null;
       updateTimerDisplay(0);
       runDayPhase();
+      runEndOfDayPhase();
       updateStatsUI();
     }
   }, 1000);
@@ -415,17 +498,55 @@ function startDayTimer() {
 
 // --- Make Dough Button Logic ---
 document.getElementById('make-dough-btn').addEventListener('click', () => {
-  if (gameState.phase !== 'management' || gameState.inventory.flour < 1) return;
-  makeDough(1);
-  updateStatsUI();
+  try {
+    if (gameState.phase !== 'management' || gameState.inventory.flour < 1) return;
+    const before = gameState.inventory.dough;
+    const made = makeDough(1);
+    updateStatsUI();
+    if (made > 0) {
+      logEvent(`Made 1 dough. (Dough: ${before} → ${gameState.inventory.dough})`);
+    }
+  } catch (e) {
+    logEvent(`<span style='color:#FF6347;'><b>Error: ${e.message}</b></span>`);
+    showErrorToast('Error: ' + e.message);
+  }
 });
 
 // --- Upgrade UI Helpers ---
 function updateUpgradeUI() {
+  // Used Microwave
+  const usedBtn = document.getElementById('buy-used-microwave-btn');
+  const usedOwned = gameState.upgrades.usedMicrowave;
+  const usedPrice = 20;
+  usedBtn.disabled = usedOwned || gameState.cash < usedPrice;
+  if (usedBtn.disabled) {
+    if (usedOwned) {
+      usedBtn.title = 'Already owned';
+    } else if (gameState.cash < usedPrice) {
+      usedBtn.title = 'Not enough cash';
+    } else {
+      usedBtn.title = 'Unavailable';
+    }
+  } else {
+    usedBtn.title = '';
+  }
+  document.getElementById('used-microwave-owned').style.display = usedOwned ? '' : 'none';
+  // Clean Microwave
   const btn = document.getElementById('buy-microwave-btn');
   const owned = gameState.upgrades.cleanMicrowave;
   const price = 50;
   btn.disabled = owned || gameState.cash < price;
+  if (btn.disabled) {
+    if (owned) {
+      btn.title = 'Already owned';
+    } else if (gameState.cash < price) {
+      btn.title = 'Not enough cash';
+    } else {
+      btn.title = 'Unavailable';
+    }
+  } else {
+    btn.title = '';
+  }
   document.getElementById('microwave-owned').style.display = owned ? '' : 'none';
 }
 
@@ -450,30 +571,211 @@ function showUpgradeToast(message) {
   toast.textContent = message;
   toast.style.opacity = '1';
   toast.style.display = '';
+  // ARIA live region
+  const liveRegion = document.getElementById('aria-live-region');
+  if (liveRegion) liveRegion.textContent = message;
   setTimeout(() => {
     toast.style.transition = 'opacity 0.5s';
     toast.style.opacity = '0';
-    setTimeout(() => { toast.style.display = 'none'; toast.style.transition = ''; }, 500);
+    setTimeout(() => {
+      toast.style.display = 'none';
+      toast.style.transition = '';
+      if (liveRegion) liveRegion.textContent = '';
+    }, 500);
   }, 2000);
 }
 
-// --- Buy Clean Microwave Button Logic ---
-document.getElementById('buy-microwave-btn').addEventListener('click', () => {
-  const price = 50;
-  if (gameState.upgrades.cleanMicrowave) return;
-  if (gameState.cash < price) return;
-  addCash(-price);
-  gameState.upgrades.cleanMicrowave = true;
-  logEvent('Purchased upgrade: Clean Microwave!');
-  showUpgradeToast('Upgrade purchased: Clean Microwave!');
-  updateUpgradeUI();
-  updateStatsUI();
+// --- Buy Used Microwave Button Logic ---
+document.getElementById('buy-used-microwave-btn').addEventListener('click', () => {
+  try {
+    const price = 20;
+    if (gameState.upgrades.usedMicrowave) return;
+    if (gameState.cash < price) return;
+    addCash(-price);
+    gameState.upgrades.usedMicrowave = true;
+    logEvent('Purchased upgrade: Used Microwave!');
+    showUpgradeToast('Upgrade purchased: Used Microwave!');
+    updateUpgradeUI();
+    updateStatsUI();
+  } catch (e) {
+    logEvent(`<span style='color:#FF6347;'><b>Error: ${e.message}</b></span>`);
+    showErrorToast('Error: ' + e.message);
+  }
 });
 
-// Update upgrade UI on stats update
-const prevUpdateStatsUI = updateStatsUI;
+// --- Buy Clean Microwave Button Logic ---
+document.getElementById('buy-microwave-btn').addEventListener('click', () => {
+  try {
+    const price = 50;
+    if (gameState.upgrades.cleanMicrowave) return;
+    if (gameState.cash < price) return;
+    addCash(-price);
+    gameState.upgrades.cleanMicrowave = true;
+    logEvent('Purchased upgrade: Clean Microwave!');
+    showUpgradeToast('Upgrade purchased: Clean Microwave!');
+    updateUpgradeUI();
+    updateStatsUI();
+  } catch (e) {
+    logEvent(`<span style='color:#FF6347;'><b>Error: ${e.message}</b></span>`);
+    showErrorToast('Error: ' + e.message);
+  }
+});
+
+// --- Business Log UI ---
+function updateLogUI() {
+  const logArea = document.querySelector('.log-scroll-area');
+  if (!logArea) return;
+  logArea.innerHTML = gameState.log
+    .map(entry => `<div class="log-entry">${entry}</div>`)
+    .join('');
+  // Auto-scroll to latest
+  logArea.scrollTop = logArea.scrollHeight;
+}
+window.updateLogUI = updateLogUI;
+
+// Update log after every stats update
+const prevUpdateStatsUI2 = updateStatsUI;
 updateStatsUI = function() {
-  prevUpdateStatsUI();
-  updateUpgradeUI();
+  prevUpdateStatsUI2();
+  updateLogUI();
 };
-window.updateStatsUI = updateStatsUI; 
+window.updateStatsUI = updateStatsUI;
+
+// Update log after every logEvent
+const prevLogEvent = logEvent;
+logEvent = function(message) {
+  prevLogEvent(message);
+  updateLogUI();
+};
+window.logEvent = logEvent;
+
+// --- Game Over Modal & Logic ---
+function triggerGameOver(reason) {
+  // Log Game Over if not already logged
+  if (!gameState.isGameOver) {
+    logEvent(`Game Over: ${reason}`);
+  }
+  gameState.isGameOver = true;
+  // Disable all action buttons
+  [
+    'buy-flour-btn',
+    'make-dough-btn',
+    'start-day-btn',
+    'buy-used-microwave-btn',
+    'buy-microwave-btn'
+  ].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = true;
+  });
+  // Show modal
+  let modal = document.getElementById('gameover-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'gameover-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(30,30,30,0.85)';
+    modal.style.display = 'flex';
+    modal.style.flexDirection = 'column';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = 2000;
+    modal.innerHTML = `
+      <div style="background: #fff; color: #1E1E1E; padding: 2em 3em; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.2); text-align: center;">
+        <h2 style="margin-top:0;">Game Over</h2>
+        <div id="gameover-reason" style="margin-bottom: 1em;"></div>
+        <button id="restart-btn" style="font-size: 1.2em; padding: 0.5em 2em;">Restart</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  document.getElementById('gameover-reason').textContent = reason;
+  modal.style.display = 'flex';
+  // Restart button logic
+  document.getElementById('restart-btn').onclick = function() {
+    modal.style.display = 'none';
+    restartGame();
+  };
+}
+
+function restartGame() {
+  // Reset all game state to initial values
+  gameState.cash = 112;
+  gameState.health = 50;
+  gameState.reputation = 0;
+  gameState.day = 1;
+  gameState.phase = 'management';
+  gameState.inventory.flour = 0;
+  gameState.inventory.dough = 0;
+  gameState.servingCapacity = 6;
+  gameState.disgust = 100;
+  gameState.recycling = 100;
+  gameState.upgrades.cleanMicrowave = false;
+  gameState.upgrades.usedMicrowave = false;
+  gameState.log = [];
+  gameState.staff = 0;
+  gameState.isGameOver = false;
+  updateStatsUI();
+  updateUpgradeUI();
+  updateMakeDoughButton();
+  updateStartDayButton();
+  updateLogUI();
+  logEvent('Game restarted!');
+}
+
+// --- Management Phase: Check for Game Over (cannot afford ingredients) ---
+const prevToManagementPhase = toManagementPhase;
+toManagementPhase = function() {
+  prevToManagementPhase();
+  // If you can't afford flour, trigger game over
+  if (gameState.cash < 5) {
+    triggerGameOver('You cannot afford flour to continue your business.');
+  }
+};
+window.toManagementPhase = toManagementPhase;
+
+// --- Error Toast/Modal for Unexpected Errors ---
+function showErrorToast(message) {
+  let toast = document.getElementById('error-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'error-toast';
+    toast.style.position = 'absolute';
+    toast.style.right = '30px';
+    toast.style.top = '180px';
+    toast.style.background = '#FF6347';
+    toast.style.color = '#fff';
+    toast.style.padding = '0.5em 1em';
+    toast.style.borderRadius = '6px';
+    toast.style.fontWeight = 'bold';
+    toast.style.boxShadow = '0 2px 8px rgba(30,30,30,0.10)';
+    toast.style.zIndex = 1001;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.opacity = '1';
+  toast.style.display = '';
+  // ARIA live region
+  const liveRegion = document.getElementById('aria-live-region');
+  if (liveRegion) liveRegion.textContent = message;
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.5s';
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      toast.style.transition = '';
+      if (liveRegion) liveRegion.textContent = '';
+    }, 2000);
+  }, 2500);
+}
+
+// --- Global Error Handler ---
+window.onerror = function(message, source, lineno, colno, error) {
+  const errMsg = `Unexpected error: ${message} (${source}:${lineno}:${colno})`;
+  logEvent(`<span style='color:#FF6347;'><b>${errMsg}</b></span>`);
+  showErrorToast('An unexpected error occurred. See log for details.');
+  return false; // Let browser log as well
+}; 

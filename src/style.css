@@ -36,8 +36,8 @@ html, body {
   background: var(--panel-white);
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(30,30,30,0.04);
-  padding: 1rem;
-  margin: 1rem 0;
+  padding: 1.2rem;
+  margin: 1.2rem 0;
 }
 
 /* Utility classes for color accents */
@@ -216,4 +216,68 @@ html, body {
   .header-controls {
     gap: 0.2rem;
   }
+}
+
+/* Focus outlines for accessibility */
+button:focus, input:focus {
+  outline: 2px solid var(--sauce-soft-red);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--cheese-soft-yellow);
+}
+
+/* Button states */
+button {
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+button:hover:not(:disabled), .header-btn:hover:not(:disabled) {
+  background: var(--cheese-soft-yellow);
+  color: var(--text-dark-charcoal);
+  box-shadow: 0 2px 8px rgba(255,99,71,0.10);
+}
+button:active:not(:disabled) {
+  background: var(--sauce-soft-red);
+  color: #fff;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
+/* Inputs: larger for touch */
+input[type="number"], input[type="text"] {
+  font-size: 1.1em;
+  padding: 0.3em 0.6em;
+  border-radius: 4px;
+  border: 1px solid var(--crust-light-beige);
+  margin-right: 0.3em;
+}
+
+/* Panel and control spacing */
+.actions-block button, .actions-block input {
+  margin-bottom: 0.4em;
+}
+
+/* ARIA live region for toasts/errors */
+#aria-live-region {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  background: var(--panel-white);
+  color: var(--text-dark-charcoal);
+  border: 1px solid var(--crust-light-beige);
+  border-radius: 4px;
+  padding: 0.3em 0.7em;
+  font-size: 0.95em;
+  box-shadow: 0 2px 8px rgba(30,30,30,0.08);
+  z-index: 1100;
+  pointer-events: none;
+  white-space: nowrap;
 } 

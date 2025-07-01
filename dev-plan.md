@@ -39,19 +39,19 @@ This plan breaks down the project into small, self-contained tasks. Each step is
 
 ## 6. Upgrade System (MVP)
 - [x] Implement single upgrade (“Clean Microwave”) and purchase logic
-- [ ] Add UI for upgrade purchase and feedback
+- [x] Add UI for upgrade purchase and feedback
 
 ## 7. Business Log & Feedback
-- [ ] Implement Business Log UI (scrollable, auto-scroll to latest)
-- [ ] Add log entries for all major actions (sales, purchases, phase changes)
-- [ ] Implement End-of-Day summary in the log
+- [x] Implement Business Log UI (scrollable, auto-scroll to latest)
+- [x] Add log entries for all major actions (sales, purchases, phase changes)
+- [x] Implement End-of-Day summary in the log
 
 ## 8. Game Over & Restart
-- [ ] Implement Game Over condition (Health = 0 or can't afford ingredients)
-- [ ] Add Game Over screen/modal and restart logic
+- [x] Implement Game Over condition (Health = 0 or can't afford ingredients)
+- [x] Add Game Over screen/modal and restart logic
 
 ## 9. UI Polish & Usability
-- [ ] Add error handling and user feedback for invalid actions
+- [x] Add error handling and user feedback for invalid actions
 - [ ] Refine UI styling for clarity and accessibility
 - [ ] Ensure all controls are keyboard accessible
 
